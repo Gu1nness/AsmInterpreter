@@ -1,6 +1,6 @@
 # -*- coding:utf8 -*-
 PC = "PC"
-SUB_OP, XOR_OP, AND_OP, ADD_OP, LEA =  "SUB_OP", "XOR_OP", "AND_OP", "ADD_OP", "LEA"
+SUB_OP, XOR_OP, AND_OP, ADD_OP =  "SUB_OP", "XOR_OP", "AND_OP", "ADD_OP"
 MINUS = "MINUS"
 
 CMP_OP, CMPL_OP, CMPB_OP, TEST = "CMP_OP", "CMPL_OP", "CMPB_OP", "TEST"

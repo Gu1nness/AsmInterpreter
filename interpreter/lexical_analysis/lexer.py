@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 """ SAI - Simple Assembly Interpreter """
 from string import hexdigits
-from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ, LEA
+from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ
 from .token_type import CMP_OP, CMPL_OP, JLE, JE, JL, JG, JMP, JMPQ
 from .token_type import NOPW, NOPL, ADD_OP, RETQ, HLT, TEST
 from .token_type import NUMBER, REGISTER, ID, ASTERISK, DOLLAR, LPAREN, RPAREN, COMMA, MINUS
@@ -19,7 +19,6 @@ RESERVED_KEYWORDS = {
     'xor' : Token(XOR_OP, "xor"),
     'and' : Token(AND_OP, "and"),
     'callq' : Token(CALLQ, "callq"),
-    'lea' : Token(LEA, "lea"),
     'cmp': Token(CMP_OP, 'cmp'),
     'cmpl': Token(CMPL_OP, 'cmpl'),
     'jle': Token(JLE, 'jle'),

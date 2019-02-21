@@ -6,85 +6,77 @@
 ###############################################################################
 from collections import OrderedDict
 
-
 class Symbol(object):
-    def __init__(self, name, type=None):
-        self.name = name
-        self.type = type
-
-
-class VarSymbol(Symbol):
-    def __init__(self, name, type):
-        super(VarSymbol, self).__init__(name, type)
-
-    def __str__(self):
-        return "<{class_name}(name='{name}', type='{type}')>".format(
-            class_name=self.__class__.__name__,
-            name=self.name,
-            type=self.type,
-        )
-
-    __repr__ = __str__
-
-class StructSymbol(Symbol):
-    def __init__(self, name, type, attributes):
-        super(StructSymbol, self).__init__(name, type)
-        self.attributes = attributes
-
-    def __str__(self):
-        return "<{class_name}(name='{name}',({attr}) type='{type}')>".format(
-            class_name=self.__class__.__name__,
-            attr=",".join([str(attribute for attribute in self.attributes.keys())]),
-            name=self.name,
-            type=self.type,
-        )
-
-    __repr__ = __str__
-
-class BuiltinTypeSymbol(Symbol):
     def __init__(self, name):
-        super(BuiltinTypeSymbol, self).__init__(name)
+        self.name = name
+
+class AddrSymbol(Symbol):
+    def __init__(self, name, addr, prog_counter):
+        super(VarSymbol, self).__init__(name)
+        self.addr = addr
+        self.prog_counter = prog_counter
 
     def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return "<{class_name}(name='{name}')>".format(
+        return "<{class_name}(name='{name}', addr='{addr}')>".format(
             class_name=self.__class__.__name__,
             name=self.name,
-        )
-
-
-class FunctionSymbol(Symbol):
-    def __init__(self, name, type, params=None):
-        super(FunctionSymbol, self).__init__(name, type=type)
-        # a list of formal parameters
-        self.params = params if params is not None else []
-
-    def __str__(self):
-        return '<{class_name}(type={type}, name={name}, parameters={params})>'.format(
-            class_name=self.__class__.__name__,
-            name=self.name,
-            params=self.params,
-            type=self.type
+            addr=self.addr,
         )
 
     __repr__ = __str__
 
+class SectionSymbol(Symbol):
+    def __init__(self, sec_name, prog_counter):
+        Symbol.__init__(self, sec_name)
+        self.prog_counter = prog_counter
+
+class RegisterSymbol(Symbol):
+    def __init__(self, name, value=None):
+        super(Symbol, self).__init__()
+        self.name = name
+        self.value = value
+
+    def __str__(self):
+        return "<{class_name}(name='{name}', value='{value}')>".format(
+            class_name=self.__class__.__name__,
+            name=self.name,
+            value=self.value,
+        )
+
+REGISTERS = [
+    ('rax', RegisterSymbol('rax', 0)),
+    ('rbx', RegisterSymbol('rbx', 0)),
+    ('rcx', RegisterSymbol('rcx', 0)),
+    ('rdx', RegisterSymbol('rdx', 0)),
+    ('eax', RegisterSymbol('eax', 0)),
+    ('ebx', RegisterSymbol('ebx', 0)),
+    ('ecx', RegisterSymbol('ecx', 0)),
+    ('edx', RegisterSymbol('edx', 0)),
+    ('rbp', RegisterSymbol('rbp', 0)),
+    ('rax', RegisterSymbol('rax', 0)),
+    ('rbx', RegisterSymbol('rbx', 0)),
+    ('rcx', RegisterSymbol('rcx', 0)),
+    ('rdx', RegisterSymbol('rdx', 0)),
+    ('rsp', RegisterSymbol('rsp', 0)),
+    ('rsi', RegisterSymbol('rsi', 0)),
+    ('rdi', RegisterSymbol('rdi', 0)),
+    ('r8', RegisterSymbol('r8', 0)),
+    ('r9', RegisterSymbol('r9', 0)),
+    ('r10', RegisterSymbol('r10', 0)),
+    ('r11', RegisterSymbol('r11', 0)),
+    ('r12', RegisterSymbol('r12', 0)),
+    ('r13', RegisterSymbol('r13', 0)),
+    ('r14', RegisterSymbol('r14', 0)),
+    ('r15', RegisterSymbol('r15', 0)),
+]
 
 class ScopedSymbolTable(object):
     def __init__(self, scope_name, scope_level, enclosing_scope=None):
-        self._symbols = OrderedDict()
+        self._symbols = OrderedDict(REGISTERS)
+        print(self._symbols["rbp"])
         self.scope_name = scope_name
         self.scope_level = scope_level
         self.enclosing_scope = enclosing_scope
-
-    def _init_builtins(self):
-        self.insert(BuiltinTypeSymbol('char'))
-        self.insert(BuiltinTypeSymbol('int'))
-        self.insert(BuiltinTypeSymbol('float'))
-        self.insert(BuiltinTypeSymbol('double'))
-        self.insert(BuiltinTypeSymbol('void'))
 
     def __str__(self):
         h1 = 'SCOPE (SCOPED SYMBOL TABLE)'

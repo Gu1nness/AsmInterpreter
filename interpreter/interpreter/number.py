@@ -1,5 +1,11 @@
 # -*- coding:utf8 -*-
-class Number(object):
+"""
+Defines a number, with all the computations associated to it.
+"""
+class Number():
+    """ A number.
+    """
+
     types = {
         "f" : "8bits",
         "e" : "32bits",
@@ -25,12 +31,12 @@ class Number(object):
 
     def __add__(self, other):
         """ self + other """
-        ttype, ctype = self._get_res_type(other)
+        ttype, _ = self._get_res_type(other)
         return Number(ttype, self.value + other.value)
 
     def __sub__(self, other):
         """ self - other """
-        ttype, ctype = self._get_res_type(other)
+        ttype, _ = self._get_res_type(other)
         return Number(ttype, self.value - other.value)
 
     def minus(self):
@@ -39,32 +45,26 @@ class Number(object):
 
     def __mul__(self, other):
         """ self * other """
-        ttype, ctype = self._get_res_type(other)
+        ttype, _ = self._get_res_type(other)
         return Number(ttype, self.value * other.value)
 
     def __truediv__(self, other):
         """ self / other """
-        ttype, ctype = self._get_res_type(other)
-        if ctype == int:
-            return Number(ttype, self.value // other.value)
-        return Number(ttype, self.value / other.value)
+        ttype, _ = self._get_res_type(other)
+        return Number(ttype, self.value // other.value)
 
     def __mod__(self, other):
         """ self % other """
-        ttype, ctype = self._get_res_type(other)
-
-        if ctype != int:
-            raise TypeError("invalid operands of types '{}' and '{}' to binary ‘operator %’".format(
-                self.type,
-                other.type
-            ))
+        ttype, _ = self._get_res_type(other)
         return Number(ttype, self.value % other.value)
 
     def __div_mod__(self, other):
+        """ Div and Mod in the same time. """
         return (self.__truediv__(other), self.__mod__(other))
 
 
     def __cmp__(self, other):
+        """ Compares two integers """
         if self.value < other.value:
             return -2
         if self.value <= other.value:
@@ -75,20 +75,21 @@ class Number(object):
             return 2
         if self.value >= other.value:
             return 1
+        raise Exception("Impossible")
 
     def __and__(self, other):
         """ self & other """
-        ttype, ctype = self._get_res_type(other)
+        ttype, _ = self._get_res_type(other)
         return Number(ttype, int(self.value & other.value))
 
     def __or__(self, other):
         """ self | other """
-        ttype, ctype = self._get_res_type(other)
+        ttype, _ = self._get_res_type(other)
         return Number(ttype, int(self.value | other.value))
 
     def __xor__(self, other):
         """ self ^ other """
-        ttype, ctype = self._get_res_type(other)
+        ttype, _ = self._get_res_type(other)
         return Number(ttype, int(self.value ^ other.value))
 
     def __bool__(self):

@@ -9,9 +9,13 @@ class Number(object):
     }
     order = ('f', 'e', 'r', 'l', 'q')
 
-    def __init__(self, ttype, value):
+    def __init__(self, ttype, value, register=""):
         self.type = ttype
-        self.value = Number.types[ttype](value)
+        self.register = register
+        if isinstance(value, str):
+            self.value = int(value, 16)
+        else:
+            self.value = value
 
     def _get_res_type(self, other):
         left_order = Number.order.index(self.type)
@@ -22,24 +26,28 @@ class Number(object):
     def __add__(self, other):
         """ self + other """
         ttype, ctype = self._get_res_type(other)
-        return Number(ttype, ctype(self.value) + ctype(other.value))
+        return Number(ttype, self.value + other.value)
 
     def __sub__(self, other):
         """ self - other """
         ttype, ctype = self._get_res_type(other)
-        return Number(ttype, ctype(self.value) - ctype(other.value))
+        return Number(ttype, self.value - other.value)
+
+    def minus(self):
+        """ - self """
+        return  Number(self.type, - self.value)
 
     def __mul__(self, other):
         """ self * other """
         ttype, ctype = self._get_res_type(other)
-        return Number(ttype, ctype(self.value) * ctype(other.value))
+        return Number(ttype, self.value * other.value)
 
     def __truediv__(self, other):
         """ self / other """
         ttype, ctype = self._get_res_type(other)
         if ctype == int:
-            return Number(ttype, ctype(self.value) // ctype(other.value))
-        return Number(ttype, ctype(self.value) / ctype(other.value))
+            return Number(ttype, self.value // other.value)
+        return Number(ttype, self.value / other.value)
 
     def __mod__(self, other):
         """ self % other """
@@ -50,7 +58,7 @@ class Number(object):
                 self.type,
                 other.type
             ))
-        return Number(ttype, ctype(self.value) % ctype(other.value))
+        return Number(ttype, self.value % other.value)
 
     def __div_mod__(self, other):
         return (self.__truediv__(other), self.__mod__(other))
@@ -63,26 +71,25 @@ class Number(object):
             return -1
         if self.value == other.value:
             return 0
-        if self.value >= other.value:
-            return 1
         if self.value > other.value:
             return 2
+        if self.value >= other.value:
+            return 1
 
     def __and__(self, other):
         """ self & other """
         ttype, ctype = self._get_res_type(other)
-        return Number(ttype, int(ctype(self.value) & ctype(other.value)))
+        return Number(ttype, int(self.value & other.value))
 
     def __or__(self, other):
         """ self | other """
         ttype, ctype = self._get_res_type(other)
-        return Number(ttype, int(ctype(self.value) | ctype(other.value)))
+        return Number(ttype, int(self.value | other.value))
 
     def __xor__(self, other):
         """ self ^ other """
         ttype, ctype = self._get_res_type(other)
-        return Number(ttype, int(ctype(self.value) ^ ctype(other.value)))
-
+        return Number(ttype, int(self.value ^ other.value))
 
     def __bool__(self):
         return bool(self.value)

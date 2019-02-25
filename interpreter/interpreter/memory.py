@@ -96,13 +96,13 @@ class Frame(Node):
 
 class FunctionFrame(Node):
     def __init__(self, section):
-        self._start = section[0].prog_counter
-        self._end = section[-1].prog_counter
-        self._frames = [Frame(instr) for instr in section]
+        self._start = section.content[0].prog_counter
+        self._end = section.content[-1].prog_counter
+        self._frames = [Frame(instr) for instr in section.content]
 
     @property
     def boundaries(self):
-        return (self._start, self.end)
+        return (self._start, self._end)
 
 class Memory():
     def __init__(self):

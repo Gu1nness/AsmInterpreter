@@ -2,7 +2,7 @@
 """ SAI - Simple Assembly Interpreter """
 from string import hexdigits
 from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ
-from .token_type import CMP_OP, CMPL_OP, JLE, JE, JL, JG, JMP, JMPQ
+from .token_type import CMP_OP, CMPL_OP, JLE, JE, JL, JG, JGE, JMP, JMPQ
 from .token_type import NOPW, NOPL, ADD_OP, RETQ, HLT, TEST
 from .token_type import NUMBER, REGISTER, ID, ASTERISK, DOLLAR, LPAREN, RPAREN, COMMA, MINUS
 from .token_type import COLON
@@ -25,6 +25,7 @@ RESERVED_KEYWORDS = {
     'je': Token(JE, 'je'),
     'jl': Token(JL, 'jl'),
     'jg': Token(JG, 'jg'),
+    'jge': Token(JGE, 'jge'),
     'jmp': Token(JMP, 'jmp'),
     'jmpq': Token(JMPQ, 'jmpq'),
     'nopw': Token(NOPW, 'nopw'),

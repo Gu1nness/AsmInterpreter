@@ -8,11 +8,8 @@ from ..syntax_analysis.tree import *
 from ..semantic_analysis.analyzer import SemanticAnalyzer
 from ..utils.utils import get_functions, MessageColor
 
-def _recurse_name(node, name=""):
-    if isinstance(node, Var):
-        return node.value
-    else:
-        return _recurse_name(node.struct_variable, name + "." + node.struct_name)
+class EndOfExecution(BaseException):
+    pass
 
 class Interpreter(NodeVisitor):
 

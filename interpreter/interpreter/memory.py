@@ -69,8 +69,8 @@ class Registers():
     def __init__(self, rsp, rbp):
         self._store = dict()
         for reg in ['rax', 'rbx', 'rcx', 'rdx', 'eax', 'ebx', 'ecx', 'edx',
-                  'rbp', 'rax', 'rbx', 'rcx', 'rdx', 'rsp', 'rsi', 'rdi',
-                  'r8', 'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15']
+                    'rbp', 'rax', 'rbx', 'rcx', 'rdx', 'rsp', 'rsi', 'rdi',
+                    'r8', 'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15']:
             self._store[reg] = 0
         self.__setitem__('rsp', rsp)
         self.__setitem__('rbp', rbp)
@@ -84,6 +84,10 @@ class Registers():
             return self._store[key]
         else:
             raise KeyError("Register %s does not exists" % key)
+
+    def __repr__(self):
+        res = ["{} : {}\n".format(reg, self._store[reg]) for reg in sorted(self._store.keys())]
+        return "".join(res)
 
 class Frame(Node):
     def __init__(self, instr):

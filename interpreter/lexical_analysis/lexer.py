@@ -4,7 +4,7 @@ from string import hexdigits
 from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ
 from .token_type import CMP_OP, CMPL_OP, JLE, JE, JL, JG, JGE, JMP, JMPQ
 from .token_type import NOPW, NOPL, ADD_OP, RETQ, HLT, TEST
-from .token_type import NUMBER, REGISTER, ID, ASTERISK, DOLLAR, LPAREN, RPAREN, COMMA, MINUS
+from .token_type import NUMBER, REGISTER, ID, ASTERISK, DOLLAR, LPAREN, RPAREN, COMMA
 from .token_type import COLON
 from .token import Token
 
@@ -100,6 +100,9 @@ class OperationLexer():
     def number(self):
         """ Returns a number written either in hexadecimal or in decimal """
         result = ''
+        if self.current_char == "-":
+            result = "-"
+            self.advance()
         while self.current_char is not None and \
               (self.current_char in hexdigits \
                or self.current_char == 'x'):
@@ -169,6 +172,9 @@ class OperationLexer():
                 self.advance()
                 return self._id(register=True)
 
+            if self.current_char == "-":
+                return self.number()
+
             if self.current_char.isdigit():
                 return self.number()
 
@@ -195,10 +201,6 @@ class OperationLexer():
             if self.current_char == ',':
                 self.advance()
                 return Token(COMMA, ",")
-
-            if self.current_char == '-':
-                self.advance()
-                return Token(MINUS, "-")
 
             if self.current_char == ':':
                 self.advance()

@@ -106,33 +106,68 @@ class FunctionFrame(Node):
 
 class Memory():
     def __init__(self):
-        self.global_frame = Frame('GLOBAL_MEMORY', None)
         rbp = 0
-        rsp = random.randrange(2**16, 2**32-1)
+        rsp = random.randrange(2**16, 2**32-1, 4)
         self.stack = Stack(rsp)
         self.registers = Registers(rsp, rbp)
         self.cmp_reg = 0
         self.ranges = {}
         self.functions = OrderedDict()
-        self.frames = []
+        self.frames = {}
+        self.prog_counters = []
 
-    def _create_frames(self)
+    def _create_frames(self):
         for function in self.functions:
-            for frame in function._frames:
+            for frame in self.functions[function]._frames:
                 self.frames[frame.prog_counter] = frame
+        self.prog_counters = sorted(self.frames.keys())
 
     def __setitem__(self, item, value):
-        if isinstance(item, Register):
-            self.registers[item.value] = value
-        elif isinstance(item, AddrExpression):
-            self.stack[item] = key
+        if item.register:
+            self.registers[item.register] = value
+            if item.register.startswith('e'):
+                self.registers['r' + item.register[1:]] = value
+        else:
+            self.stack[item.value] = value
 
     def __getitem__(self, item):
         return self.functions[item]
 
+    def iadd(self, item, other):
+        if item.register:
+            self.registers[item.register] += other
+            if item.register.startswith('e'):
+                self.registers['r' + item.register[1:]] += other
+        else:
+            self.stack[item.value] += other
+
+    def isub(self, item, other):
+        if item.register:
+            self.registers[item.register] -= other
+            if item.register.startswith('e'):
+                self.registers['r' + item.register[1:]] -= other
+        else:
+            self.stack[item.value] -= other
+
+    def iand(self, item, other):
+        if item.register:
+            self.registers[item.register] &= other
+            if item.register.startswith('e'):
+                self.registers['r' + item.register[1:]] &= other
+        else:
+            self.stack[item.value] &= other
+
+    def ixor(self, item, other):
+        if item.register:
+            self.registers[item.register] ^= other
+            if item.register.startswith('e'):
+                self.registers['r' + item.register[1:]] ^= other
+        else:
+            self.stack[item.value] &= other
+
     def __repr__(self):
         return "{}\nStack\n{}\n{}".format(
-            self.global_frame,
+            self.registers,
             '=' * 40,
             self.stack
         )
@@ -143,6 +178,6 @@ class Memory():
     def push(self, value, length):
         self.stack.push(value, length)
 
-    def push(self, value, length):
-        self.stack.push(value, length)
+    def pop(self, length):
+        self.stack.pop(length)
 

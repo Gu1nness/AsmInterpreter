@@ -6,7 +6,7 @@ from ..lexical_analysis.token_type import *
 from ..syntax_analysis.parser import Parser
 from ..syntax_analysis.tree import *
 from ..semantic_analysis.analyzer import SemanticAnalyzer
-from ..utils.utils import get_functions, MessageColor
+from ..utils.utils import MessageColor
 
 class EndOfExecution(BaseException):
     pass

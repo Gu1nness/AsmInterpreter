@@ -1,10 +1,8 @@
 # -*- coding:utf8 -*-
 from ..syntax_analysis.tree import NodeVisitor
-#from ..syntax_analysis.parser import
 from .table import *
 from ..lexical_analysis.token_type import POP, POPQ, PUSH, PUSHQ
-from ..utils.utils import get_functions, get_name, MessageColor
-import sys
+from ..utils.utils import MessageColor
 
 
 class SemanticError(Exception):

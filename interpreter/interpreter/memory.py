@@ -1,46 +1,68 @@
 # -*- coding:utf8 -*-
 import random
+from collections import OrderedDict
 from ctypes import c_int
-from ..syntax_analysis.tree import Node
+from ..syntax_analysis.tree import Node, Register, AddrExpression
 
 class Stack(object):
     def __init__(self, address):
         self._stack = dict({address: 0})
+        self._max = address
 
     def __bool__(self):
         return bool(self._stack)
 
+    def __getitem__(self, key):
+        if not self._stack.get(key.value, False):
+            self.__setitem__(key.value, 0)
+        return self._stack[key.value]
+
     def __setitem__(self, key, value):
         self._stack[key] = value
-        self._stack = dict({key : self._stack[key] for key in sorted(self._stack.key())})
-
-    def __getitem___(self, key):
-        return self._stack[key]
+        self._stack = dict({key : self._stack[key] for key in sorted(self._stack.keys())})
+        self._max = max(self._max, key)
 
     def push(self, variable, length):
         if length == 1:
-            self._stack.append(c_int(variable))
+            key = self._max + 4
+            self._stack[key] = c_int(variable.value)
         elif length == 2:
+            key = self._max + 4
+            key_2 = self._max + 8
             first = self.c_int(variable)
             second = self.c_int(variable >> 32)
-            self._stack.append(first)
-            self._stack.append(second)
+            self._stack[key] = first
+            self._stack[key_2] = second
+            self._max = key_2
         else:
             raise RuntimeError("Unknown int size")
 
     def pop(self, length):
         result = -1
         if length == 1 and self._stack:
-            result = self._stack.pop()
+            result = self._stack[self._max]
+            del self._stack[self._max]
+            self._max -= 4
         elif length == 2 and len(self._stack) >= 2:
-            first = self._stack.pop() << 32
-            second = self._stack.pop()
+            first = self._stack[self._max] << 32
+            del self._stack[self._max]
+            second = self._stack[self._max - 4]
+            del self._stack[self._max - 4]
+            self._max -= 8
             return first + second
         else:
             raise RuntimeError("SEGFAULT")
 
     def __repr__(self):
-        return '|'.join([self._stack[key] for key in sorted(self._stack.keys)])
+        keys = [str(key) for key in self._stack.keys()]
+        max_len = max(len(key) for key in keys)
+        l_1 = "|".join(keys) + "\n"
+        res = ""
+        for i  in self._stack.keys():
+            value = str(self._stack[i])
+            remaining_len = max_len - len(value)
+            res += value + " " * remaining_len + "|"
+        return l_1 + res
 
 
 class Registers():

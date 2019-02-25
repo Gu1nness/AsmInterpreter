@@ -73,7 +73,6 @@ REGISTERS = [
 class ScopedSymbolTable(object):
     def __init__(self, scope_name, scope_level, enclosing_scope=None):
         self._symbols = OrderedDict(REGISTERS)
-        print(self._symbols["rbp"])
         self.scope_name = scope_name
         self.scope_level = scope_level
         self.enclosing_scope = enclosing_scope

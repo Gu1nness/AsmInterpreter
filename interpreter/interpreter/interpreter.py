@@ -20,32 +20,37 @@ class Interpreter(NodeVisitor):
 
     def preload_functions(self, tree):
         for child in tree.children:
-            frame = FunctionFrame(node)
-            self.memory.functions[node.name] = frame
-            self.memory.ranges[frame.boundariess] = node.name
+            frame = FunctionFrame(child)
+            self.memory.functions[child.name.value] = frame
+            self.memory.ranges[frame.boundaries] = child.name
         self.memory._create_frames()
 
-    def visit_FunctionFrame(self, node, start=0):
-        current = [frame for frame in self._frames if frame.prog_counter >= start]
-        for content in current:
-            self.visit(content)
+    def visit_Register(self, node):
+        reg = self.memory.registers[node.value]
+        return Number(node.value[0], reg, register=node.value)
 
     def visit_Frame(self, node):
         self.visit(node.instr)
 
 
     def visit_BinOp(self, node):
+        node.right.pointer = False
+        node.left.pointer = True
         if node.op.type == ADD_OP:
-            return self.visit(node.left) + self.visit(node.right)
+            self.memory.iadd(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == SUB_OP:
-            return self.visit(node.left) - self.visit(node.right)
+            self.memory.isub(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == AND_OP:
-            return self.visit(node.left) & self.visit(node.right)
+            self.memory.iand(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == XOR_OP:
-            return self.visit(node.left) ^ self.visit(node.right)
+            self.memory.ixor(self.visit(node.right), self.visit(node.left).value)
 
     def visit_MovOp(self, node):
-        self.memory[self.visit(self.node.left)] = self.visit(self.node.right)
+        node.right.pointer = False
+        node.left.pointer = True
+        addr = self.visit(node.right)
+        value = self.visit(node.left).value
+        self.memory[addr] = self.visit(node.left).value
 
     def visit_StackOp(self, node):
         value = self.visit(node.expr)
@@ -54,16 +59,13 @@ class Interpreter(NodeVisitor):
         if node.op.type == PUSHQ:
             self.memory.push(value, length=2)
         if node.op.type == POP:
-            self.memory.pop(value, length=1)
+            self.memory.pop(length=1)
         if node.op.type == POPQ:
-            self.memory.pop(value, length=2)
+            self.memory.pop(length=2)
 
     def visit_JmpStmt(self, node):
-        addr = node.jmpaddr
-        for (start, end) in self.memory.ranges.keys():
-            if start <= addr and addr <= end:
-                fct_frame = self.memory.ranges[(start,end)]
-                break
+        addr = int(node.jmpaddr.value, 16)
+        frame = self.memory.frames[addr]
         if node.op.type == JG and self.cmp_reg == 2:
             self.jmpd = True
             self.frame = frame
@@ -140,8 +142,21 @@ class Interpreter(NodeVisitor):
     def interpret(self, tree):
         self.preload_functions(tree)
         node = self.memory['main']
-        res = self.visit(node)
-        return res
+        self.frame = self.memory.frames[node._start]
+        try:
+            while True:
+                self.visit(self.frame)
+                if self.jmpd:
+                    self.jmpd = False
+                else:
+                    index = self.memory.prog_counters.index(self.frame.prog_counter)
+                    try:
+                        self.frame = self.memory.frames[self.memory.prog_counters[index + 1]]
+                    except IndexError:
+                        raise EndOfExecution
+        except EndOfExecution as _:
+            print(self.memory)
+            return self.memory.registers['rax']
 
     @staticmethod
     def run(program):

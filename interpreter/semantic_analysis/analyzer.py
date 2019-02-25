@@ -99,7 +99,6 @@ class SemanticAnalyzer(NodeVisitor):
         left_op = node.left
         rtype = self.visit(right_op)
         ltype = self.visit(left_op)
-        print(left_op)
         if node.op.type.endswith("L"):
             return (ltype + SemanticAnalyzer.Sizes("l")) + rtype
 

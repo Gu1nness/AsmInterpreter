@@ -1,4 +1,5 @@
 # -*- coding:utf8 -*-
+from queue import Queue
 from .memory import *
 from .number import Number
 from ..lexical_analysis.lexer import Lexer
@@ -8,13 +9,16 @@ from ..syntax_analysis.tree import *
 from ..semantic_analysis.analyzer import SemanticAnalyzer
 from ..utils.utils import MessageColor
 
+AsmQueue = Queue()
+
 class EndOfExecution(BaseException):
     pass
 
 class Interpreter(NodeVisitor):
 
-    def __init__(self):
+    def __init__(self, break_points):
         self.memory = Memory()
+        self.break_points = break_points
         self.frame = None
         self.jmpd = False
 
@@ -24,6 +28,8 @@ class Interpreter(NodeVisitor):
             self.memory.functions[child.name.value] = frame
             self.memory.ranges[frame.boundaries] = child.name
         self.memory._create_frames()
+        if not self.memory._check(self.break_points):
+            raise Exception("Breakpoints are not all in the frames")
 
     def visit_Register(self, node):
         reg = self.memory.registers[node.value]
@@ -145,6 +151,8 @@ class Interpreter(NodeVisitor):
         self.frame = self.memory.frames[node._start]
         try:
             while True:
+                if self.frame.prog_counter in self.break_points:
+                    AsmQueue.put((self.frame.prog_counter, self.memory))
                 self.visit(self.frame)
                 if self.jmpd:
                     self.jmpd = False

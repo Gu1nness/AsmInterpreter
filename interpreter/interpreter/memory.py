@@ -122,6 +122,10 @@ class Memory():
                 self.frames[frame.prog_counter] = frame
         self.prog_counters = sorted(self.frames.keys())
 
+
+    def _check(self, break_points):
+        return all([break_point in self.frames.keys() for break_point in break_points])
+
     def __setitem__(self, item, value):
         if item.register:
             self.registers[item.register] = value

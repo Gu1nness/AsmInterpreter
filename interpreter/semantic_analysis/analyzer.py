@@ -59,7 +59,6 @@ class SemanticAnalyzer(NodeVisitor):
         for child in node.children:
             self.visit(child)
 
-        print(self.current_scope)
         if not self.current_scope.lookup('main'):
             error(
                 "Error: Undeclared mandatory function main"

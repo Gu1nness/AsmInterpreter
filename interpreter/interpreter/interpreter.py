@@ -163,7 +163,6 @@ class Interpreter(NodeVisitor):
                     except IndexError:
                         raise EndOfExecution
         except EndOfExecution as _:
-            print(self.memory)
             return self.memory.registers['rax']
 
     @staticmethod

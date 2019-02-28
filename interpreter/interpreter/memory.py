@@ -72,9 +72,9 @@ class Stack(object):
 class Registers():
     def __init__(self, rsp, rbp):
         self._store = dict()
-        for reg in ['rax', 'rbx', 'rcx', 'rdx', 'eax', 'ebx', 'ecx', 'edx',
-                    'rbp', 'rax', 'rbx', 'rcx', 'rdx', 'rsp', 'rsi', 'rdi',
-                    'r8', 'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15']:
+        for reg in ['ax', 'bx', 'cx', 'dx' 'rax', 'rbx', 'rcx', 'rdx', 'rbp', 'rax', 'rbx', 'rcx',
+                    'rdx', 'rsp', 'rsi', 'rdi', 'r8', 'r9', 'r10', 'r11',
+                    'r12', 'r13', 'r14', 'r15', 'eax', 'ebx', 'ecx', 'edx']:
             self._store[reg] = 0
         self.__setitem__('rsp', rsp)
         self.__setitem__('rbp', rbp)
@@ -134,7 +134,9 @@ class Memory():
         if item.register:
             self.registers[item.register] = value
             if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] = value
+                self.registers['r' + item.register[1:]] %= 2**32
         else:
             self.stack[item.value] = value
 
@@ -145,7 +147,9 @@ class Memory():
         if item.register:
             self.registers[item.register] += other
             if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] += other
+                self.registers['r' + item.register[1:]] %= 2**32
         else:
             self.stack[item.value] += other
 
@@ -153,7 +157,9 @@ class Memory():
         if item.register:
             self.registers[item.register] -= other
             if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] -= other
+                self.registers['r' + item.register[1:]] %= 2**32
         else:
             self.stack[item.value] -= other
 
@@ -161,7 +167,9 @@ class Memory():
         if item.register:
             self.registers[item.register] &= other
             if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] &= other
+                self.registers['r' + item.register[1:]] %= 2**32
         else:
             self.stack[item.value] &= other
 
@@ -169,7 +177,9 @@ class Memory():
         if item.register:
             self.registers[item.register] ^= other
             if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] ^= other
+                self.registers['r' + item.register[1:]] %= 2**32
         else:
             self.stack[item.value] &= other
 

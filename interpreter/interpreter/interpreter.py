@@ -1,5 +1,6 @@
 # -*- coding:utf8 -*-
 from queue import Queue
+from copy import deepcopy
 from .memory import *
 from .number import Number
 from ..lexical_analysis.lexer import Lexer
@@ -151,9 +152,9 @@ class Interpreter(NodeVisitor):
         self.frame = self.memory.frames[node._start]
         try:
             while True:
-                if self.frame.prog_counter in self.break_points:
-                    AsmQueue.put((self.frame.prog_counter, self.memory))
                 self.visit(self.frame)
+                if self.frame.prog_counter in self.break_points:
+                    AsmQueue.put((self.frame.prog_counter, deepcopy(self.memory)))
                 if self.jmpd:
                     self.jmpd = False
                 else:

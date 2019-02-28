@@ -14,6 +14,8 @@ class Stack(object):
 
     def __getitem__(self, key):
         if isinstance(key, int):
+            if not self._stack.get(key, False):
+                self.__setitem__(key, 0)
             return self._stack[key]
         elif not self._stack.get(key.value, False):
             self.__setitem__(key.value, 0)
@@ -22,15 +24,15 @@ class Stack(object):
     def __setitem__(self, key, value):
         self._stack[key] = value
         self._stack = dict({key : self._stack[key] for key in sorted(self._stack.keys())})
-        self._max = max(self._max, key)
+        self._max = max(self._max, key + 4)
 
     def push(self, variable, length):
         if length == 1:
-            key = self._max + 4
+            key = self._max
             self._stack[key] = c_int(variable.value)
         elif length == 2:
-            key = self._max + 4
-            key_2 = self._max + 8
+            key = self._max
+            key_2 = self._max + 4
             first = self.c_int(variable)
             second = self.c_int(variable >> 32)
             self._stack[key] = first

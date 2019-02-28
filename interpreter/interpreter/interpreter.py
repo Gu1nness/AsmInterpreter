@@ -20,6 +20,7 @@ class Interpreter(NodeVisitor):
     def __init__(self, break_points):
         self.memory = Memory()
         self.break_points = break_points
+        self.cmp_reg = 0
         self.frame = None
         self.jmpd = False
 
@@ -51,6 +52,29 @@ class Interpreter(NodeVisitor):
             self.memory.iand(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == XOR_OP:
             self.memory.ixor(self.visit(node.right), self.visit(node.left).value)
+        if node.op.type == TEST:
+            right = self.visit(node.right).value
+            left = self.visit(node.left).value
+            self.cmp_reg = int(right & left)
+
+    def visit_XchgOp(self, node):
+        node.right.pointer = False
+        node.left.pointer = True
+        left = self.visit(node.right)
+        right = self.visit(node.left)
+        if left.register:
+            self.memory.registers[left.register] = right
+            if left.register.startswith('e'):
+                self.memory.registers['r' + left.register[1:]] = right
+        else:
+            self.stack[right.value] = left
+        if right.register:
+            self.memory.registers[right.register] = left
+            if right.register.startswith('e'):
+                self.memory.registers['r' + right.register[1:]] = left
+        else:
+            self.stack[right.value] = left
+
 
     def visit_MovOp(self, node):
         node.right.pointer = False
@@ -85,6 +109,10 @@ class Interpreter(NodeVisitor):
             self.jmpd = True
             self.frame = frame
             return
+        if node.op.type == JNE and self.cmp_reg != 0:
+            self.jmpd = True
+            self.frame = frame
+            return
         if node.op.type == JLE and self.cmp_reg == -1:
             self.jmpd = True
             self.frame = frame
@@ -94,6 +122,10 @@ class Interpreter(NodeVisitor):
             self.frame = frame
             return
         if node.op.type == JMPQ:
+            self.jmpd = True
+            self.frame = frame
+            return
+        if node.op.type == JMP:
             self.jmpd = True
             self.frame = frame
             return

@@ -103,6 +103,10 @@ class SemanticAnalyzer(NodeVisitor):
         """ A binary operation """
         return self._binop(node)
 
+    def visit_XchgOp(self, node):
+        """ A xchg operation """
+        return self._binop(node)
+
     def visit_MovOp(self, node):
         """ A mov[l] operation """
         return self._binop(node)

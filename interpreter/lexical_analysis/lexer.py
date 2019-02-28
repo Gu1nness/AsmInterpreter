@@ -2,8 +2,8 @@
 """ SAI - Simple Assembly Interpreter """
 from string import hexdigits
 from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ
-from .token_type import CMP_OP, CMPL_OP, JLE, JE, JL, JG, JGE, JMP, JMPQ
-from .token_type import NOPW, NOPL, ADD_OP, RETQ, HLT, TEST
+from .token_type import CMP_OP, CMPL_OP, JLE, JE, JNE, JL, JG, JGE, JMP, JMPQ
+from .token_type import NOPW, NOPL, XCHG, ADD_OP, RETQ, HLT, TEST
 from .token_type import NUMBER, REGISTER, ID, ASTERISK, DOLLAR, LPAREN, RPAREN, COMMA
 from .token_type import COLON
 from .token import Token
@@ -23,6 +23,7 @@ RESERVED_KEYWORDS = {
     'cmpl': Token(CMPL_OP, 'cmpl'),
     'jle': Token(JLE, 'jle'),
     'je': Token(JE, 'je'),
+    'jne': Token(JNE, 'jne'),
     'jl': Token(JL, 'jl'),
     'jg': Token(JG, 'jg'),
     'jge': Token(JGE, 'jge'),
@@ -30,6 +31,7 @@ RESERVED_KEYWORDS = {
     'jmpq': Token(JMPQ, 'jmpq'),
     'nopw': Token(NOPW, 'nopw'),
     'nopl': Token(NOPL, 'nopl'),
+    'xchg': Token(XCHG, 'xchg'),
     'add': Token(ADD_OP, 'add'),
     'retq': Token(RETQ, 'retq'),
     'hlt': Token(HLT, 'hlt'),

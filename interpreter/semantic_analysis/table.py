@@ -44,6 +44,10 @@ class RegisterSymbol(Symbol):
         )
 
 REGISTERS = [
+    ('ax', RegisterSymbol('ax', 0)),
+    ('bx', RegisterSymbol('bx', 0)),
+    ('cx', RegisterSymbol('cx', 0)),
+    ('dx', RegisterSymbol('dx', 0)),
     ('rax', RegisterSymbol('rax', 0)),
     ('rbx', RegisterSymbol('rbx', 0)),
     ('rcx', RegisterSymbol('rcx', 0)),

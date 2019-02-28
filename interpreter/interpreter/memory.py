@@ -13,7 +13,9 @@ class Stack(object):
         return bool(self._stack)
 
     def __getitem__(self, key):
-        if not self._stack.get(key.value, False):
+        if isinstance(key, int):
+            return self._stack[key]
+        elif not self._stack.get(key.value, False):
             self.__setitem__(key.value, 0)
         return self._stack[key.value]
 

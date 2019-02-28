@@ -132,7 +132,7 @@ class Memory():
 
     def __setitem__(self, item, value):
         if item.register:
-            self.registers[item.register] = value
+            self.registers[item.register] = value % 2**64
             if item.register.startswith('e'):
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] = value
@@ -145,7 +145,7 @@ class Memory():
 
     def iadd(self, item, other):
         if item.register:
-            self.registers[item.register] += other
+            self.registers[item.register] += other % 2**64
             if item.register.startswith('e'):
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] += other
@@ -155,7 +155,7 @@ class Memory():
 
     def isub(self, item, other):
         if item.register:
-            self.registers[item.register] -= other
+            self.registers[item.register] -= other % 2**64
             if item.register.startswith('e'):
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] -= other
@@ -165,7 +165,7 @@ class Memory():
 
     def iand(self, item, other):
         if item.register:
-            self.registers[item.register] &= other
+            self.registers[item.register] &= other % 2**64
             if item.register.startswith('e'):
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] &= other
@@ -175,7 +175,7 @@ class Memory():
 
     def ixor(self, item, other):
         if item.register:
-            self.registers[item.register] ^= other
+            self.registers[item.register] ^= other % 2**64
             if item.register.startswith('e'):
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] ^= other

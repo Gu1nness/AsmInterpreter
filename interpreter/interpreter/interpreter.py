@@ -44,14 +44,26 @@ class Interpreter(NodeVisitor):
     def visit_BinOp(self, node):
         node.right.pointer = False
         node.left.pointer = True
-        if node.op.type == ADD_OP:
+        if node.op.type in [ADD_OP, ADDL_OP]:
             self.memory.iadd(self.visit(node.right), self.visit(node.left).value)
+        if node.op.type == LEA_OP:
+            node.right.pointer = False
+            node.left.pointer = False
+            addr = self.visit(node.right)
+            value = self.visit(node.left).value
+            self.memory[addr] = self.visit(node.left).value
+        if node.op.type == MUL_OP:
+            self.memory.imul(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == SUB_OP:
             self.memory.isub(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == AND_OP:
             self.memory.iand(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == XOR_OP:
             self.memory.ixor(self.visit(node.right), self.visit(node.left).value)
+        if node.op.type == SHL_OP:
+            self.memory.ishl(self.visit(node.right), self.visit(node.left).value)
+        if node.op.type == SHR_OP:
+            self.memory.ishr(self.visit(node.right), self.visit(node.left).value)
         if node.op.type == TEST:
             right = self.visit(node.right).value
             left = self.visit(node.left).value

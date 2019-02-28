@@ -144,8 +144,8 @@ class SemanticAnalyzer(NodeVisitor):
         return SemanticAnalyzer.Sizes("l")
 
     def visit_TernaryAddrExpression(self, node):
-        reg_1 = self.visit(node.ref_1)
-        reg_2 = self.visit(node.ref_2)
+        reg_1 = self.visit(node.reg_1)
+        reg_2 = self.visit(node.reg_2)
         return reg_1 + reg_2
 
     @staticmethod

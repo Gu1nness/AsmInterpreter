@@ -2,12 +2,14 @@
 """ SCI - Simple C Interpreter """
 
 from ..lexical_analysis.token_type import ID
-from ..lexical_analysis.token_type import XOR_OP, AND_OP, ADD_OP, SUB_OP
+from ..lexical_analysis.token_type import XOR_OP, AND_OP, ADD_OP, ADDL_OP, SUB_OP, MUL_OP
+from ..lexical_analysis.token_type import LEA_OP
+from ..lexical_analysis.token_type import SHL_OP, SHR_OP
 from ..lexical_analysis.token_type import CMP_OP, CMPL_OP, CMPB_OP, TEST
 from ..lexical_analysis.token_type import JL, JG, JGE, JLE, JE, JNE, JMP, JMPQ
 from ..lexical_analysis.token_type import POP, POPQ, PUSH, PUSHQ, MOV, MOVL
 from ..lexical_analysis.token_type import CALLQ, HLT, RETQ
-from ..lexical_analysis.token_type import NOPW, NOPL, XCHG
+from ..lexical_analysis.token_type import NOP, NOPW, NOPL, XCHG
 from ..lexical_analysis.token_type import REGISTER
 from ..lexical_analysis.token_type import COMMA, DOLLAR, LPAREN, RPAREN, NUMBER, ASTERISK
 from .tree import *
@@ -99,7 +101,10 @@ class Parser():
         self.current_token = self.current_token_line[0]
         if self.current_token.type is CALLQ:
             return self.callqop(prog_counter, line)
-        if self.current_token.type in [SUB_OP, XOR_OP, AND_OP, ADD_OP, TEST]:
+        if self.current_token.type in [SUB_OP, XOR_OP, AND_OP, ADD_OP, ADDL_OP, MUL_OP,
+                                       SHL_OP, TEST]:
+            return self.binop(prog_counter, line)
+        if self.current_token.type is LEA_OP:
             return self.binop(prog_counter, line)
         if self.current_token.type in [JL, JG, JGE, JLE, JE, JNE, JMP, JMPQ]:
             return self.jmpop(prog_counter, line)
@@ -109,7 +114,7 @@ class Parser():
             return self.stackop(prog_counter, line)
         if self.current_token.type in [MOV, MOVL]:
             return self.movop(prog_counter, line)
-        if self.current_token.type in [NOPW, NOPL]:
+        if self.current_token.type in [NOP, NOPW, NOPL]:
             return self.noop(prog_counter, line)
         if self.current_token.type is XCHG:
             return self.xchgop(prog_counter, line)
@@ -368,6 +373,28 @@ class Parser():
                 prog_counter,
                 line
             )
+        if self.current_token.type is LPAREN:
+            self.eat(LPAREN)
+            register = self.addr_expression(prog_counter, line)
+            if self.current_token.type is COMMA:
+                token = self.current_token
+                self.eat(COMMA)
+                second_reg = self.addr_expression(prog_counter, line)
+                if self.current_token.type is COMMA:
+                    self.eat(COMMA)
+                    number = self.current_token
+                    self.eat(NUMBER)
+                    self.eat(RPAREN)
+                    return TernaryAddrExpression(
+                        token=token,
+                        reg_1=register,
+                        reg_2=second_reg,
+                        offset=number,
+                        prog_counter=prog_counter,
+                        line=line
+                    )
+                error("Wrong compound expression")
+            self.eat(RPAREN)
 
 
 

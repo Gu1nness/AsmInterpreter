@@ -2,8 +2,10 @@
 """ SAI - Simple Assembly Interpreter """
 from string import hexdigits
 from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ
+from .token_type import SHL_OP, SHR_OP
 from .token_type import CMP_OP, CMPL_OP, JLE, JE, JNE, JL, JG, JGE, JMP, JMPQ
-from .token_type import NOPW, NOPL, XCHG, ADD_OP, RETQ, HLT, TEST
+from .token_type import NOPW, NOPL, NOP, XCHG, ADD_OP, ADDL_OP, RETQ, HLT, TEST, MUL_OP
+from .token_type import LEA_OP
 from .token_type import NUMBER, REGISTER, ID, ASTERISK, DOLLAR, LPAREN, RPAREN, COMMA
 from .token_type import COLON
 from .token import Token
@@ -14,9 +16,12 @@ RESERVED_KEYWORDS = {
     'pop': Token(POP, 'pop'),
     'popq': Token(POPQ, 'popq'),
     'sub': Token(SUB_OP, 'sub'),
+    'imul': Token(MUL_OP, 'imul'),
     'mov' : Token(MOV, "mov"),
     'movl' : Token(MOVL, "movl"),
     'xor' : Token(XOR_OP, "xor"),
+    'shl' : Token(SHL_OP, "shl"),
+    'shr' : Token(SHR_OP, "shr"),
     'and' : Token(AND_OP, "and"),
     'callq' : Token(CALLQ, "callq"),
     'cmp': Token(CMP_OP, 'cmp'),
@@ -30,9 +35,12 @@ RESERVED_KEYWORDS = {
     'jmp': Token(JMP, 'jmp'),
     'jmpq': Token(JMPQ, 'jmpq'),
     'nopw': Token(NOPW, 'nopw'),
+    'nop': Token(NOP, 'nop'),
     'nopl': Token(NOPL, 'nopl'),
     'xchg': Token(XCHG, 'xchg'),
     'add': Token(ADD_OP, 'add'),
+    'addl': Token(ADDL_OP, 'addl'),
+    'lea': Token(LEA_OP, 'lea'),
     'retq': Token(RETQ, 'retq'),
     'hlt': Token(HLT, 'hlt'),
     'test': Token(TEST, 'test'),

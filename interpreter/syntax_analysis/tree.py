@@ -51,6 +51,13 @@ class BinOp(Node):
         self.token = self.op = op
         self.right = right
 
+class XchgOp(Node):
+    def __init__(self, left, op, right, prog_counter, line):
+        Node.__init__(self, prog_counter, line)
+        self.left = left
+        self.token = self.op = op
+        self.right = right
+
 class MovOp(Node):
     def __init__(self, left, op, right, prog_counter, line):
         Node.__init__(self, prog_counter, line)

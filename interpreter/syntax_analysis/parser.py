@@ -1,12 +1,13 @@
 # -*- coding:utf8 -*-
 """ SCI - Simple C Interpreter """
 
+from ..lexical_analysis.token_type import ID
 from ..lexical_analysis.token_type import XOR_OP, AND_OP, ADD_OP, SUB_OP
 from ..lexical_analysis.token_type import CMP_OP, CMPL_OP, CMPB_OP, TEST
-from ..lexical_analysis.token_type import JL, JG, JGE, JLE, JE, JMP, JMPQ
+from ..lexical_analysis.token_type import JL, JG, JGE, JLE, JE, JNE, JMP, JMPQ
 from ..lexical_analysis.token_type import POP, POPQ, PUSH, PUSHQ, MOV, MOVL
 from ..lexical_analysis.token_type import CALLQ, HLT, RETQ
-from ..lexical_analysis.token_type import NOPW, NOPL
+from ..lexical_analysis.token_type import NOPW, NOPL, XCHG
 from ..lexical_analysis.token_type import REGISTER
 from ..lexical_analysis.token_type import COMMA, DOLLAR, LPAREN, RPAREN, NUMBER, ASTERISK
 from .tree import *
@@ -86,7 +87,9 @@ class Parser():
             line = operation.line
             prog_counter = int(operation.pc.value, 16)
             self.current_token_line = operation.tokens[1:]
-            result.append(self.operation(prog_counter=prog_counter, line=line))
+            oper = self.operation(prog_counter=prog_counter, line=line)
+            if oper:
+                result.append(oper)
         return result
 
     def operation(self, prog_counter, line):
@@ -96,11 +99,11 @@ class Parser():
         self.current_token = self.current_token_line[0]
         if self.current_token.type is CALLQ:
             return self.callqop(prog_counter, line)
-        if self.current_token.type in [SUB_OP, XOR_OP, AND_OP, ADD_OP]:
+        if self.current_token.type in [SUB_OP, XOR_OP, AND_OP, ADD_OP, TEST]:
             return self.binop(prog_counter, line)
-        if self.current_token.type in [JL, JG, JGE, JLE, JE, JMP, JMPQ]:
+        if self.current_token.type in [JL, JG, JGE, JLE, JE, JNE, JMP, JMPQ]:
             return self.jmpop(prog_counter, line)
-        if self.current_token.type in [CMP_OP, CMPL_OP, CMPB_OP, TEST]:
+        if self.current_token.type in [CMP_OP, CMPL_OP, CMPB_OP]:
             return self.cmpop(prog_counter, line)
         if self.current_token.type in [POP, POPQ, PUSH, PUSHQ]:
             return self.stackop(prog_counter, line)
@@ -108,10 +111,14 @@ class Parser():
             return self.movop(prog_counter, line)
         if self.current_token.type in [NOPW, NOPL]:
             return self.noop(prog_counter, line)
+        if self.current_token.type is XCHG:
+            return self.xchgop(prog_counter, line)
         if self.current_token.type is HLT:
             return self.hltop(prog_counter, line)
         if self.current_token.type is RETQ:
             return self.retqop(prog_counter, line)
+        if self.current_token.type is ID:
+            return None
         error("Unkown operation {} at line {}"
               .format(self.current_token, line)
               )
@@ -251,6 +258,27 @@ class Parser():
             op=operation,
             line=line,
             prog_counter=prog_counter
+        )
+
+    def xchgop(self, prog_counter, line):
+        """
+        xchgop                      : XCHG ADDR COMMA ADDR
+        """
+        operation = self.current_token
+        self.eat(operation.type)
+        left = self.addr_expression(prog_counter, line)
+        if self.current_token.type is COMMA:
+            self.eat(COMMA)
+        else:
+            error("Incompatible Operand {} with binary operator xchg at line{}"
+                  .format(left, line)
+                  )
+        return XchgOp(
+            left=left,
+            op=operation,
+            right=self.addr_expression(prog_counter, line),
+            prog_counter=prog_counter,
+            line=line
         )
 
     def hltop(self, prog_counter, line):

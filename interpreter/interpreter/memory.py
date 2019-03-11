@@ -3,6 +3,7 @@ import random
 from collections import OrderedDict
 from ctypes import c_int
 from ..syntax_analysis.tree import Node, Register, AddrExpression
+import sys
 
 class Stack(object):
     def __init__(self, address):
@@ -91,6 +92,7 @@ class Registers():
             raise KeyError("Register %s does not exists" % key)
 
     def __repr__(self):
+        res = ""
         res = ["{} : {}\n".format(reg, self._store[reg]) for reg in sorted(self._store.keys())]
         return "".join(res)
 
@@ -162,7 +164,7 @@ class Memory():
                 self.registers['r' + item.register[1:]] *= other
                 self.registers['r' + item.register[1:]] %= 2**32
         else:
-            self.stack[item.value] += other
+            self.stack[item.value] *= other
 
     def isub(self, item, other):
         if item.register:
@@ -192,7 +194,27 @@ class Memory():
                 self.registers['r' + item.register[1:]] ^= other
                 self.registers['r' + item.register[1:]] %= 2**32
         else:
-            self.stack[item.value] &= other
+            self.stack[item.value] ^= other
+
+    def inot(self, item):
+        if item.register:
+            self.registers[item.register] = ~self.registers[item.register] % 2**64
+            if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
+                self.registers['r' + item.register[1:]] = ~self.registers['r' + item.register[1:]]
+                self.registers['r' + item.register[1:]] %= 2**32
+        else:
+            self.stack[item.value] = ~self.stack[item.value]
+
+    def ineg(self, item):
+        if item.register:
+            self.registers[item.register] = -self.registers[item.register] % 2**64
+            if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
+                self.registers['r' + item.register[1:]] = -self.registers['r' + item.register[1:]]
+                self.registers['r' + item.register[1:]] %= 2**32
+        else:
+            self.stack[item.value] = -self.stack[item.value]
 
     def ishl(self, item, other):
         if item.register:
@@ -202,7 +224,7 @@ class Memory():
                 self.registers['r' + item.register[1:]] <<= other
                 self.registers['r' + item.register[1:]] %= 2**32
         else:
-            self.stack[item.value] &= other
+            self.stack[item.value] <<= other
 
     def ishr(self, item, other):
         if item.register:
@@ -212,7 +234,7 @@ class Memory():
                 self.registers['r' + item.register[1:]] >>= other
                 self.registers['r' + item.register[1:]] %= 2**32
         else:
-            self.stack[item.value] &= other
+            self.stack[item.value] >>= other
 
     def __repr__(self):
         return "{}\nStack\n{}\n{}".format(

@@ -3,6 +3,7 @@
 from string import hexdigits
 from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ
 from .token_type import SHL_OP, SHR_OP
+from .token_type import NOT_OP, NEG_OP
 from .token_type import CMP_OP, CMPL_OP, JLE, JE, JNE, JL, JG, JGE, JMP, JMPQ
 from .token_type import NOPW, NOPL, NOP, XCHG, ADD_OP, ADDL_OP, RETQ, HLT, TEST, MUL_OP
 from .token_type import LEA_OP
@@ -23,6 +24,8 @@ RESERVED_KEYWORDS = {
     'shl' : Token(SHL_OP, "shl"),
     'shr' : Token(SHR_OP, "shr"),
     'and' : Token(AND_OP, "and"),
+    'not' : Token(NOT_OP, "not"),
+    'neg' : Token(NEG_OP, "neg"),
     'callq' : Token(CALLQ, "callq"),
     'cmp': Token(CMP_OP, 'cmp'),
     'cmpl': Token(CMPL_OP, 'cmpl'),

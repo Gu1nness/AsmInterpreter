@@ -9,6 +9,7 @@ from ..syntax_analysis.parser import Parser
 from ..syntax_analysis.tree import *
 from ..semantic_analysis.analyzer import SemanticAnalyzer
 from ..utils.utils import MessageColor
+import sys
 
 AsmQueue = Queue()
 
@@ -31,6 +32,12 @@ class Interpreter(NodeVisitor):
             self.memory.ranges[frame.boundaries] = child.name
         self.memory._create_frames()
         if not self.memory._check(self.break_points):
+            sys.stderr.write(str(["0x%08x" % key for key in
+                                  self.memory.frames.keys()]) + '\n')
+            res = ["0x%08x" % break_point for break_point in self.break_points if not
+                   break_point in self.memory.frames.keys()]
+            sys.stderr.write(str(res) + "\n")
+            sys.stderr.flush()
             raise Exception("Breakpoints are not all in the frames")
 
     def visit_Register(self, node):
@@ -39,6 +46,13 @@ class Interpreter(NodeVisitor):
 
     def visit_Frame(self, node):
         self.visit(node.instr)
+
+    def visit_UnOp(self, node):
+        node.operand.pointer = True
+        if node.op.type == NOT_OP:
+            self.memory.inot(self.visit(node.operand))
+        if node.op.type == NEG_OP:
+            self.memory.ineg(self.visit(node.operand))
 
 
     def visit_BinOp(self, node):
@@ -113,7 +127,7 @@ class Interpreter(NodeVisitor):
             self.jmpd = True
             self.frame = frame
             return
-        if node.op.type == JGE and self.cmp_reg == 1:
+        if node.op.type == JGE and self.cmp_reg >= 1:
             self.jmpd = True
             self.frame = frame
             return
@@ -125,7 +139,7 @@ class Interpreter(NodeVisitor):
             self.jmpd = True
             self.frame = frame
             return
-        if node.op.type == JLE and self.cmp_reg == -1:
+        if node.op.type == JLE and self.cmp_reg <= -1:
             self.jmpd = True
             self.frame = frame
             return
@@ -175,7 +189,10 @@ class Interpreter(NodeVisitor):
         return Number('l', node.value)
 
     def visit_TernaryAddrExpression(self, node):
-        return self.visit(reg_1) + self.visit(offset) * self.visit(reg_2)
+        if node.reg_1:
+            return self.visit(node.reg_1) + self.visit(node.offset) * self.visit(node.reg_2)
+        else:
+            return self.visit(node.offset) * self.visit(node.reg_2)
 
     def visit_CompoundAddrExpression(self, node):
         if node.token.type == NUMBER:

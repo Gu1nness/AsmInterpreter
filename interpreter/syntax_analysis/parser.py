@@ -3,6 +3,7 @@
 
 from ..lexical_analysis.token_type import ID
 from ..lexical_analysis.token_type import XOR_OP, AND_OP, ADD_OP, ADDL_OP, SUB_OP, MUL_OP
+from ..lexical_analysis.token_type import NOT_OP, NEG_OP
 from ..lexical_analysis.token_type import LEA_OP
 from ..lexical_analysis.token_type import SHL_OP, SHR_OP
 from ..lexical_analysis.token_type import CMP_OP, CMPL_OP, CMPB_OP, TEST
@@ -104,6 +105,8 @@ class Parser():
         if self.current_token.type in [SUB_OP, XOR_OP, AND_OP, ADD_OP, ADDL_OP, MUL_OP,
                                        SHL_OP, TEST]:
             return self.binop(prog_counter, line)
+        if self.current_token.type in [NOT_OP, NEG_OP]:
+            return self.unop(prog_counter, line)
         if self.current_token.type is LEA_OP:
             return self.binop(prog_counter, line)
         if self.current_token.type in [JL, JG, JGE, JLE, JE, JNE, JMP, JMPQ]:
@@ -172,6 +175,21 @@ class Parser():
             prog_counter=prog_counter,
             line=line
         )
+
+    def unop(self, prog_counter, line):
+        """
+        unop                        : UNOP ADDR
+        """
+        operation = self.current_token
+        self.eat(operation.type)
+        operand  = self.addr_expression(prog_counter, line)
+        return UnOp(
+            operand=operand,
+            op=operation,
+            prog_counter=prog_counter,
+            line=line
+        )
+
 
     def jmpop(self, prog_counter, line):
         """
@@ -341,7 +359,9 @@ class Parser():
                     second_reg = self.addr_expression(prog_counter, line)
                     if self.current_token.type is COMMA:
                         self.eat(COMMA)
-                        number = self.current_token
+                        number = AddrExpression(self.current_token,
+                                                prog_counter=prog_counter,
+                                                line=line)
                         self.eat(NUMBER)
                         self.eat(RPAREN)
                         return TernaryAddrExpression(
@@ -382,7 +402,9 @@ class Parser():
                 second_reg = self.addr_expression(prog_counter, line)
                 if self.current_token.type is COMMA:
                     self.eat(COMMA)
-                    number = self.current_token
+                    number = AddrExpression(self.current_token,
+                                            prog_counter=prog_counter,
+                                            line=line)
                     self.eat(NUMBER)
                     self.eat(RPAREN)
                     return TernaryAddrExpression(

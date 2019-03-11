@@ -103,6 +103,12 @@ class SemanticAnalyzer(NodeVisitor):
         """ A binary operation """
         return self._binop(node)
 
+    def visit_UnOp(self, node):
+        """ A unary operation """
+        operand = node.operand
+        otype = self.visit(operand)
+        return otype
+
     def visit_XchgOp(self, node):
         """ A xchg operation """
         return self._binop(node)
@@ -144,9 +150,12 @@ class SemanticAnalyzer(NodeVisitor):
         return SemanticAnalyzer.Sizes("l")
 
     def visit_TernaryAddrExpression(self, node):
-        reg_1 = self.visit(node.reg_1)
-        reg_2 = self.visit(node.reg_2)
-        return reg_1 + reg_2
+        if node.reg_1:
+            reg_1 = self.visit(node.reg_1)
+            reg_2 = self.visit(node.reg_2)
+            return reg_1 + reg_2
+        else:
+            return self.visit(node.reg_2)
 
     @staticmethod
     def analyze(tree):

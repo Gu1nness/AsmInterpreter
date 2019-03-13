@@ -59,7 +59,12 @@ class Interpreter(NodeVisitor):
         node.right.pointer = False
         node.left.pointer = True
         if node.op.type in [ADD_OP, ADDL_OP]:
-            self.memory.iadd(self.visit(node.right), self.visit(node.left).value)
+            value = self.visit(node.left).value
+            self.memory.iadd(self.visit(node.right), value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
         if node.op.type == LEA_OP:
             node.right.pointer = False
             node.left.pointer = False
@@ -67,17 +72,43 @@ class Interpreter(NodeVisitor):
             value = self.visit(node.left).value
             self.memory[addr] = self.visit(node.left).value
         if node.op.type == MUL_OP:
-            self.memory.imul(self.visit(node.right), self.visit(node.left).value)
+            value = self.visit(node.left).value
+            self.memory.imul(self.visit(node.right), value)
         if node.op.type == SUB_OP:
-            self.memory.isub(self.visit(node.right), self.visit(node.left).value)
+            value = self.visit(node.left).value
+            self.memory.isub(self.visit(node.right), value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
         if node.op.type == AND_OP:
-            self.memory.iand(self.visit(node.right), self.visit(node.left).value)
+            value = self.visit(node.left).value
+            self.memory.iand(self.visit(node.right), value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
         if node.op.type == XOR_OP:
-            self.memory.ixor(self.visit(node.right), self.visit(node.left).value)
+            value = self.visit(node.left).value
+            self.memory.ixor(self.visit(node.right), value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
         if node.op.type == SHL_OP:
-            self.memory.ishl(self.visit(node.right), self.visit(node.left).value)
+            value = self.visit(node.left).value
+            self.memory.ishl(self.visit(node.right), value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
         if node.op.type == SHR_OP:
-            self.memory.ishr(self.visit(node.right), self.visit(node.left).value)
+            value = self.visit(node.left).value
+            self.memory.ishr(self.visit(node.right), value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
         if node.op.type == TEST:
             right = self.visit(node.right).value
             left = self.visit(node.left).value

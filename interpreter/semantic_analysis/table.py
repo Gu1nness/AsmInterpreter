@@ -75,6 +75,14 @@ REGISTERS = [
     ('r13', RegisterSymbol('r13', 0)),
     ('r14', RegisterSymbol('r14', 0)),
     ('r15', RegisterSymbol('r15', 0)),
+    ('r8d', RegisterSymbol('r8d', 0)),
+    ('r9d', RegisterSymbol('r9d', 0)),
+    ('r10d', RegisterSymbol('r10d', 0)),
+    ('r11d', RegisterSymbol('r11d', 0)),
+    ('r12d', RegisterSymbol('r12d', 0)),
+    ('r13d', RegisterSymbol('r13d', 0)),
+    ('r14d', RegisterSymbol('r14d', 0)),
+    ('r15d', RegisterSymbol('r15d', 0)),
 ]
 
 class ScopedSymbolTable(object):

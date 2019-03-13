@@ -75,8 +75,9 @@ class Registers():
         self._store = dict()
         for reg in ['ax', 'bx', 'cx', 'dx', 'rax', 'rbx', 'rcx', 'rdx', 'rbp',
                     'rsp', 'rsi', 'rdi', 'r8', 'r9', 'r10', 'r11', 'r12',
-                    'r13', 'r14', 'r15', 'eax', 'ebx', 'ecx', 'edx', 'esp',
-                    'esi']:
+                    'r13', 'r14', 'r15', 'r8d', 'r9d', 'r10d', 'r11d', 'r12d',
+                    'r13d', 'r14d', 'r15d','eax', 'ebx', 'ecx', 'edx', 'esp',
+                    'esi', 'edi']:
             self._store[reg] = 0
         self.__setitem__('rsp', rsp)
         self.__setitem__('rbp', rbp)
@@ -140,6 +141,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] = value
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] = value
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] = value
 
@@ -153,6 +158,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] += other
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] += other
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] += other
 
@@ -163,6 +172,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] *= other
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] *= other
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] *= other
 
@@ -173,6 +186,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] -= other
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] -= other
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] -= other
 
@@ -183,6 +200,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] &= other
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] &= other
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] &= other
 
@@ -193,6 +214,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] ^= other
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] ^= other
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] ^= other
 
@@ -203,6 +228,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] = ~self.registers['r' + item.register[1:]]
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] = ~self.registers[item.register[:-1]]
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] = ~self.stack[item.value]
 
@@ -213,6 +242,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] = -self.registers['r' + item.register[1:]]
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] = -self.registers[item.register[:-1]]
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] = -self.stack[item.value]
 
@@ -223,6 +256,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] <<= other
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] <<= other
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] <<= other
 
@@ -233,6 +270,10 @@ class Memory():
                 self.registers[item.register] %= 2**32
                 self.registers['r' + item.register[1:]] >>= other
                 self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] >>= other
+                self.registers[item.register[:-1]] %= 2**32
         else:
             self.stack[item.value] >>= other
 

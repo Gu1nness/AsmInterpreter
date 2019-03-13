@@ -51,6 +51,14 @@ class BinOp(Node):
         self.token = self.op = op
         self.right = right
 
+class TernOp(Node):
+    def __init__(self, left, op, middle, right, prog_counter, line):
+        Node.__init__(self, prog_counter, line)
+        self.left = left
+        self.middle = middle
+        self.token = self.op = op
+        self.right = right
+
 class UnOp(Node):
     def __init__(self, operand, op, prog_counter, line):
         Node.__init__(self, prog_counter, line)

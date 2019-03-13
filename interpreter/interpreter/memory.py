@@ -179,6 +179,16 @@ class Memory():
         else:
             self.stack[item.value] *= other
 
+    def mul(self, item, other, other_bis):
+        if item.register:
+            self.registers[item.register] = (other * other_bis) % 2**64
+            if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
+                self.registers['r' + item.register[1:]] = other * other_bis
+                self.registers['r' + item.register[1:]] %= 2**32
+        else:
+            self.stack[item.value] = other * other_bis
+
     def isub(self, item, other):
         if item.register:
             self.registers[item.register] -= other % 2**64

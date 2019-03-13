@@ -102,9 +102,11 @@ class Parser():
         self.current_token = self.current_token_line[0]
         if self.current_token.type is CALLQ:
             return self.callqop(prog_counter, line)
-        if self.current_token.type in [SUB_OP, XOR_OP, AND_OP, ADD_OP, ADDL_OP, MUL_OP,
+        if self.current_token.type in [SUB_OP, XOR_OP, AND_OP, ADD_OP, ADDL_OP,
                                        SHL_OP, TEST]:
             return self.binop(prog_counter, line)
+        if self.current_token.type is MUL_OP:
+            return self.ternaryop(prog_counter, line)
         if self.current_token.type in [NOT_OP, NEG_OP]:
             return self.unop(prog_counter, line)
         if self.current_token.type is LEA_OP:
@@ -175,6 +177,40 @@ class Parser():
             prog_counter=prog_counter,
             line=line
         )
+
+    def ternaryop(self, prog_counter, line):
+        """
+        ternaryop                      : BINOP ADDR COMMA ADDR (COMMA ADDR)?
+        """
+        operation = self.current_token
+        self.eat(operation.type)
+        left = self.addr_expression(prog_counter, line)
+        if self.current_token.type is COMMA:
+            self.eat(COMMA)
+        else:
+            error("Incompatible Operand {} with binary operator {} at line{}"
+                  .format(left, operation.value, line)
+                  )
+        middle = self.addr_expression(prog_counter, line)
+        if self.current_token.type is COMMA:
+            self.eat(COMMA)
+            right = self.addr_expression(prog_counter, line)
+            return TernOp(
+                left=left,
+                op=operation,
+                middle=middle,
+                right=right,
+                prog_counter=prog_counter,
+                line=line
+            )
+        else:
+            return BinOp(
+                left=left,
+                op=operation,
+                right=middle,
+                prog_counter=prog_counter,
+                line=line
+            )
 
     def unop(self, prog_counter, line):
         """

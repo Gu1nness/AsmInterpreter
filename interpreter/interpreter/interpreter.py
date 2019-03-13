@@ -114,6 +114,16 @@ class Interpreter(NodeVisitor):
             left = self.visit(node.left).value
             self.cmp_reg = int(right & left)
 
+    def visit_TernOp(self, node):
+        node.right.pointer = False
+        node.middle.pointer = True
+        node.left.pointer = True
+        if node.op.type in [MUL_OP]:
+            self.memory.mul(self.visit(node.right),
+                            self.visit(node.left).value,
+                            self.visit(node.middle).value,
+                            )
+
     def visit_XchgOp(self, node):
         node.right.pointer = False
         node.left.pointer = True

@@ -103,6 +103,17 @@ class SemanticAnalyzer(NodeVisitor):
         """ A binary operation """
         return self._binop(node)
 
+    def visit_TernOp(self, node):
+        """ A binary operation """
+        right_op = node.right
+        middle_op = node.middle
+        left_op = node.left
+        rtype = self.visit(right_op)
+        mtype = self.visit(middle_op)
+        ltype = self.visit(left_op)
+        if node.op.type.endswith("L"):
+            return (ltype + SemanticAnalyzer.Sizes("l")) + rtype + mtype
+
     def visit_UnOp(self, node):
         """ A unary operation """
         operand = node.operand

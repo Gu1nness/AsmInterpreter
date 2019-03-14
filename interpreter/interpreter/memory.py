@@ -245,6 +245,20 @@ class Memory():
         else:
             self.stack[item.value] = ~self.stack[item.value]
 
+    def idec(self, item):
+        if item.register:
+            self.registers[item.register] -= 1 % 2**64
+            if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
+                self.registers['r' + item.register[1:]] -= 1
+                self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] -= 1
+                self.registers[item.register[:-1]] %= 2**32
+        else:
+            self.stack[item.value] = ~self.stack[item.value]
+
     def ineg(self, item):
         if item.register:
             self.registers[item.register] = -self.registers[item.register] % 2**64

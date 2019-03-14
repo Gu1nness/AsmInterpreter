@@ -53,6 +53,13 @@ class Interpreter(NodeVisitor):
             self.memory.inot(self.visit(node.operand))
         if node.op.type == NEG_OP:
             self.memory.ineg(self.visit(node.operand))
+        if node.op.type == DEC_OP:
+            value = self.visit(node.operand)
+            self.memory.idec(value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
 
 
     def visit_BinOp(self, node):

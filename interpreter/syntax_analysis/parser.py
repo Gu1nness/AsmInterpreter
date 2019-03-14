@@ -3,7 +3,7 @@
 
 from ..lexical_analysis.token_type import ID
 from ..lexical_analysis.token_type import XOR_OP, AND_OP, ADD_OP, ADDL_OP, SUB_OP, MUL_OP
-from ..lexical_analysis.token_type import NOT_OP, NEG_OP
+from ..lexical_analysis.token_type import NOT_OP, NEG_OP, DEC_OP
 from ..lexical_analysis.token_type import LEA_OP
 from ..lexical_analysis.token_type import SHL_OP, SHR_OP
 from ..lexical_analysis.token_type import CMP_OP, CMPL_OP, CMPB_OP, TEST
@@ -107,7 +107,7 @@ class Parser():
             return self.binop(prog_counter, line)
         if self.current_token.type is MUL_OP:
             return self.ternaryop(prog_counter, line)
-        if self.current_token.type in [NOT_OP, NEG_OP]:
+        if self.current_token.type in [NOT_OP, NEG_OP, DEC_OP]:
             return self.unop(prog_counter, line)
         if self.current_token.type is LEA_OP:
             return self.binop(prog_counter, line)

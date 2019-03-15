@@ -261,9 +261,9 @@ class Interpreter(NodeVisitor):
         self.frame = self.memory.frames[node._start]
         try:
             while True:
-                self.visit(self.frame)
                 if self.frame.prog_counter in self.break_points:
                     AsmQueue.put((self.frame.prog_counter, deepcopy(self.memory)))
+                self.visit(self.frame)
                 if self.jmpd:
                     self.jmpd = False
                 else:

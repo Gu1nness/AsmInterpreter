@@ -4,7 +4,8 @@ from string import hexdigits
 from .token_type import PUSH, PUSHQ, POP, POPQ, SUB_OP, MOV, MOVL, XOR_OP, AND_OP, CALLQ
 from .token_type import SHL_OP, SHR_OP
 from .token_type import NOT_OP, NEG_OP
-from .token_type import DEC_OP
+from .token_type import DEC_OP, INC_OP
+from .token_type import DATA16_OP
 from .token_type import CMP_OP, CMPL_OP, JLE, JE, JNE, JL, JG, JGE, JMP, JMPQ
 from .token_type import NOPW, NOPL, NOP, XCHG, ADD_OP, ADDL_OP, RETQ, HLT, TEST, MUL_OP
 from .token_type import LEA_OP
@@ -28,6 +29,7 @@ RESERVED_KEYWORDS = {
     'not' : Token(NOT_OP, "not"),
     'neg' : Token(NEG_OP, "neg"),
     'dec' : Token(DEC_OP, "dec"),
+    'inc' : Token(INC_OP, "inc"),
     'callq' : Token(CALLQ, "callq"),
     'cmp': Token(CMP_OP, 'cmp'),
     'cmpl': Token(CMPL_OP, 'cmpl'),
@@ -42,6 +44,7 @@ RESERVED_KEYWORDS = {
     'nopw': Token(NOPW, 'nopw'),
     'nop': Token(NOP, 'nop'),
     'nopl': Token(NOPL, 'nopl'),
+    'data16': Token(DATA16_OP, 'data16'),
     'xchg': Token(XCHG, 'xchg'),
     'add': Token(ADD_OP, 'add'),
     'addl': Token(ADDL_OP, 'addl'),
@@ -162,6 +165,9 @@ class OperationLexer():
         if not res:
             self.tokens = None
         if operation.value == '' or operation.type in [RETQ, HLT]:
+            self.tokens = [number, operation]
+            return
+        if operation.type == DATA16_OP:
             self.tokens = [number, operation]
             return
         self.skip_whitespace()

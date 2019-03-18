@@ -3,14 +3,14 @@
 
 from ..lexical_analysis.token_type import ID
 from ..lexical_analysis.token_type import XOR_OP, AND_OP, ADD_OP, ADDL_OP, SUB_OP, MUL_OP
-from ..lexical_analysis.token_type import NOT_OP, NEG_OP, DEC_OP
+from ..lexical_analysis.token_type import NOT_OP, NEG_OP, DEC_OP, INC_OP
 from ..lexical_analysis.token_type import LEA_OP
 from ..lexical_analysis.token_type import SHL_OP, SHR_OP
 from ..lexical_analysis.token_type import CMP_OP, CMPL_OP, CMPB_OP, TEST
 from ..lexical_analysis.token_type import JL, JG, JGE, JLE, JE, JNE, JMP, JMPQ
 from ..lexical_analysis.token_type import POP, POPQ, PUSH, PUSHQ, MOV, MOVL
 from ..lexical_analysis.token_type import CALLQ, HLT, RETQ
-from ..lexical_analysis.token_type import NOP, NOPW, NOPL, XCHG
+from ..lexical_analysis.token_type import NOP, NOPW, NOPL, XCHG, DATA16_OP
 from ..lexical_analysis.token_type import REGISTER
 from ..lexical_analysis.token_type import COMMA, DOLLAR, LPAREN, RPAREN, NUMBER, ASTERISK
 from .tree import *
@@ -107,7 +107,7 @@ class Parser():
             return self.binop(prog_counter, line)
         if self.current_token.type is MUL_OP:
             return self.ternaryop(prog_counter, line)
-        if self.current_token.type in [NOT_OP, NEG_OP, DEC_OP]:
+        if self.current_token.type in [NOT_OP, NEG_OP, DEC_OP, INC_OP]:
             return self.unop(prog_counter, line)
         if self.current_token.type is LEA_OP:
             return self.binop(prog_counter, line)
@@ -119,7 +119,7 @@ class Parser():
             return self.stackop(prog_counter, line)
         if self.current_token.type in [MOV, MOVL]:
             return self.movop(prog_counter, line)
-        if self.current_token.type in [NOP, NOPW, NOPL]:
+        if self.current_token.type in [NOP, NOPW, NOPL, DATA16_OP]:
             return self.noop(prog_counter, line)
         if self.current_token.type is XCHG:
             return self.xchgop(prog_counter, line)

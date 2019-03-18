@@ -18,12 +18,14 @@ class EndOfExecution(BaseException):
 
 class Interpreter(NodeVisitor):
 
-    def __init__(self, break_points):
+    def __init__(self, break_points, event):
         self.memory = Memory()
         self.break_points = break_points
         self.cmp_reg = 0
         self.frame = None
         self.jmpd = False
+        self.can_run = event
+        self.can_run.set()
 
     def preload_functions(self, tree):
         for child in tree.children:
@@ -56,6 +58,13 @@ class Interpreter(NodeVisitor):
         if node.op.type == DEC_OP:
             value = self.visit(node.operand)
             self.memory.idec(value)
+            if value == 0:
+                self.cmp_reg = 0
+            else:
+                self.cmp_reg = 1
+        if node.op.type == INC_OP:
+            value = self.visit(node.operand)
+            self.memory.iinc(value)
             if value == 0:
                 self.cmp_reg = 0
             else:
@@ -154,8 +163,12 @@ class Interpreter(NodeVisitor):
         node.right.pointer = False
         node.left.pointer = True
         addr = self.visit(node.right)
+        print("====")
+        print(node.right)
+        print(addr)
         value = self.visit(node.left).value
-        self.memory[addr] = self.visit(node.left).value
+        print(value)
+        self.memory[addr] = value
 
     def visit_StackOp(self, node):
         value = self.visit(node.expr)
@@ -245,6 +258,7 @@ class Interpreter(NodeVisitor):
     def visit_CompoundAddrExpression(self, node):
         if node.token.type == NUMBER:
             if node.pointer:
+                #print(node.offset)
                 addr = self.visit(node.offset) + self.visit(node.register)
                 res = self.memory.stack[self.visit(node.offset) + self.visit(node.register)]
                 return Number(node.register.value[0], res)
@@ -261,9 +275,11 @@ class Interpreter(NodeVisitor):
         self.frame = self.memory.frames[node._start]
         try:
             while True:
+                self.can_run.wait()
+                self.visit(self.frame)
                 if self.frame.prog_counter in self.break_points:
                     AsmQueue.put((self.frame.prog_counter, deepcopy(self.memory)))
-                self.visit(self.frame)
+                    self.can_run.clear()
                 if self.jmpd:
                     self.jmpd = False
                 else:

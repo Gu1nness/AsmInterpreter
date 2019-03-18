@@ -34,8 +34,8 @@ class Stack(object):
         elif length == 2:
             key = self._max
             key_2 = self._max + 4
-            first = self.c_int(variable)
-            second = self.c_int(variable >> 32)
+            first = c_int(variable)
+            second = c_int(variable >> 32)
             self._stack[key] = first
             self._stack[key_2] = second
             self._max = key_2
@@ -257,7 +257,21 @@ class Memory():
                 self.registers[item.register[:-1]] -= 1
                 self.registers[item.register[:-1]] %= 2**32
         else:
-            self.stack[item.value] = ~self.stack[item.value]
+            self.stack[item.value] -= 1
+
+    def iinc(self, item):
+        if item.register:
+            self.registers[item.register] += 1 % 2**64
+            if item.register.startswith('e'):
+                self.registers[item.register] %= 2**32
+                self.registers['r' + item.register[1:]] += 1
+                self.registers['r' + item.register[1:]] %= 2**32
+            if item.register.endswith('d'):
+                self.registers[item.register] %= 2**32
+                self.registers[item.register[:-1]] += 1
+                self.registers[item.register[:-1]] %= 2**32
+        else:
+            self.stack[item.value] += 1
 
     def ineg(self, item):
         if item.register:
